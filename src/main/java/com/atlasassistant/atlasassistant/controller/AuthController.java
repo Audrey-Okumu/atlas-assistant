@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.atlasassistant.atlasassistant.config.JwtUtil;
 import com.atlasassistant.atlasassistant.model.User;
 import com.atlasassistant.atlasassistant.repository.UserRepository;
 
@@ -15,10 +16,12 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
@@ -31,16 +34,10 @@ public class AuthController {
     public String login(@RequestBody User loginRequest) {
         User existingUser = userRepository.findByEmail(loginRequest.getEmail());
 
-        if (existingUser == null) {
+        if (existingUser == null || !passwordEncoder.matches(loginRequest.getPassword(), existingUser.getPassword())) {
             return "Invalid email or password";
         }
 
-        boolean passwordMatches = passwordEncoder.matches(loginRequest.getPassword(), existingUser.getPassword());
-
-        if (!passwordMatches) {
-            return "Invalid email or password";
-        }
-
-        return "Login successful";
+        return jwtUtil.generateToken(existingUser.getEmail());
     }
 }
