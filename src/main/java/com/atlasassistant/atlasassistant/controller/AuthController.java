@@ -26,4 +26,21 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
+
+    @PostMapping("/login")
+    public String login(@RequestBody User loginRequest) {
+        User existingUser = userRepository.findByEmail(loginRequest.getEmail());
+
+        if (existingUser == null) {
+            return "Invalid email or password";
+        }
+
+        boolean passwordMatches = passwordEncoder.matches(loginRequest.getPassword(), existingUser.getPassword());
+
+        if (!passwordMatches) {
+            return "Invalid email or password";
+        }
+
+        return "Login successful";
+    }
 }
