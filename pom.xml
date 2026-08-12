@@ -11,7 +11,7 @@
 	<groupId>com.atlasassistant</groupId>
 	<artifactId>atlas-assistant</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
+	<name>Atlas Assistant</name>
 	<description/>
 	<url/>
 	<licenses>
@@ -71,6 +71,10 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.12.6</version>
             <scope>runtime</scope>
+        </dependency>
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
 	</dependencies>
 
