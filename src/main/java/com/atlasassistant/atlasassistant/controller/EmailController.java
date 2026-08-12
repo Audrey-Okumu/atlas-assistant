@@ -1,5 +1,6 @@
 package com.atlasassistant.atlasassistant.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,18 +23,27 @@ public class EmailController {
     private final GmailService gmailService;
     private final GoogleTokenService googleTokenService;
 
-    public EmailController(UserRepository userRepository, GoogleTokenRepository googleTokenRepository, GmailService gmailService, GoogleTokenService googleTokenService) {
+    public EmailController(UserRepository userRepository, GoogleTokenRepository googleTokenRepository,
+                            GmailService gmailService, GoogleTokenService googleTokenService) {
         this.userRepository = userRepository;
         this.googleTokenRepository = googleTokenRepository;
         this.gmailService = gmailService;
         this.googleTokenService = googleTokenService;
     }
 
-
     @GetMapping("/recent")
-    public List<String> getRecentEmails() throws Exception {
-        User user = userRepository.findByEmail("akelloaudrey3@gmail.com");
+    public List<String> getRecentEmails(Principal principal) throws Exception {
+        String email = principal.getName();
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("Authenticated user not found in database: " + email);
+        }
+
         GoogleToken googleToken = googleTokenRepository.findByUser(user);
+        if (googleToken == null) {
+            throw new RuntimeException("No Google account connected for user: " + email);
+        }
 
         String validAccessToken = googleTokenService.getValidAccessToken(googleToken);
 

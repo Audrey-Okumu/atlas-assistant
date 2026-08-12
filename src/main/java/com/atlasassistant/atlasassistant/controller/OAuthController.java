@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.atlasassistant.atlasassistant.config.JwtUtil;
 import com.atlasassistant.atlasassistant.model.GoogleToken;
 import com.atlasassistant.atlasassistant.model.User;
 import com.atlasassistant.atlasassistant.repository.GoogleTokenRepository;
@@ -23,13 +24,16 @@ public class OAuthController {
     private final OAuth2AuthorizedClientService authorizedClientService;
     private final UserRepository userRepository;
     private final GoogleTokenRepository googleTokenRepository;
+    private final JwtUtil jwtUtil;
 
     public OAuthController(OAuth2AuthorizedClientService authorizedClientService,
                             UserRepository userRepository,
-                            GoogleTokenRepository googleTokenRepository) {
+                            GoogleTokenRepository googleTokenRepository,
+                            JwtUtil jwtUtil) {
         this.authorizedClientService = authorizedClientService;
         this.userRepository = userRepository;
         this.googleTokenRepository = googleTokenRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/oauth2/success")
@@ -63,7 +67,8 @@ public class OAuthController {
         googleToken.setAccessTokenExpiresAt(accessToken.getExpiresAt());
 
         googleTokenRepository.save(googleToken);
+        String appJwt = jwtUtil.generateToken(user.getEmail());
 
-        return "Google account connected successfully for " + email;
+        return "Google account connected successfully for " + email + " | Your Atlas Assistant token: " + appJwt;
     }
 }
