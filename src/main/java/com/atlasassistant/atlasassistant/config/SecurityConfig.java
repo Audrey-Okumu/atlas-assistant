@@ -31,7 +31,7 @@ public class SecurityConfig {
             http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/**", "/oauth2/**", "/login/**").permitAll()
+                    .requestMatchers("/auth/**", "/oauth2/**", "/login/**", "/webhook/**").permitAll()
                     .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
