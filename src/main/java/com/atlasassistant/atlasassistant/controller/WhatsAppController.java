@@ -40,10 +40,11 @@ public class WhatsAppController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE)
-    public String receiveMessage(@RequestParam("Body") String body) {
+    public String receiveMessage(@RequestParam("From") String from, @RequestParam("Body") String body) {
+        String fromNumber = from.replace("whatsapp:", "");
         String reply;
         try {
-            reply = handleUserQuestion(body);
+            reply = handleUserQuestion(fromNumber, body);
         } catch (Exception e) {
             e.printStackTrace();
             reply = "Sorry, something went wrong processing your request.";
@@ -52,14 +53,21 @@ public class WhatsAppController {
         String safeReply = reply.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            + "<Response><Message>" + safeReply + "</Message></Response>";
+        + "<Response><Message>" + safeReply + "</Message></Response>";
     }
 
-    private String handleUserQuestion(String question) throws Exception {
-        // TODO: once real WhatsApp numbers are linked to Atlas Assistant users,
-        // look up the correct User by phone number instead of hardcoding.
-        User user = userRepository.findByEmail("akelloaudrey3@gmail.com");
+    private String handleUserQuestion(String fromPhoneNumber, String question) throws Exception {
+        User user = userRepository.findByPhoneNumber(fromPhoneNumber);
+
+        if (user == null) {
+            return "This WhatsApp number isn't linked to an Atlas Assistant account yet. Please     register and connect your Google account first.";
+        }
+
         GoogleToken googleToken = googleTokenRepository.findByUser(user);
+        if (googleToken == null) {
+            return "Your account isn't connected to Google yet. Please connect your Google account first.";
+        }
+
         String accessToken = googleTokenService.getValidAccessToken(googleToken);
 
         List<String> emails = gmailService.getRecentEmailSubjects(accessToken);
