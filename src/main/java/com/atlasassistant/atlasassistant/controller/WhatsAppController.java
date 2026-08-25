@@ -2,6 +2,8 @@ package com.atlasassistant.atlasassistant.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,8 @@ public class WhatsAppController {
     private final CalendarService calendarService;
     private final AiService aiService;
 
+    private static final Logger logger = LoggerFactory.getLogger(WhatsAppController.class);
+
     public WhatsAppController(UserRepository userRepository, GoogleTokenRepository googleTokenRepository,
                                GoogleTokenService googleTokenService, GmailService gmailService,
                                CalendarService calendarService, AiService aiService) {
@@ -45,10 +49,10 @@ public class WhatsAppController {
         String reply;
         try {
             reply = handleUserQuestion(fromNumber, body);
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to process WhatsApp message", e);
             reply = "Sorry, something went wrong processing your request.";
-        }
+}
 
         String safeReply = reply.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 
