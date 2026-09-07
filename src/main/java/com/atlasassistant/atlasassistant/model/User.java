@@ -61,4 +61,13 @@ public class User {
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    private String lastRemindedEventSummary;
+private String lastNotifiedEmailSubject;
+
+public String getLastRemindedEventSummary() { return lastRemindedEventSummary; }
+public void setLastRemindedEventSummary(String lastRemindedEventSummary) { this.lastRemindedEventSummary = lastRemindedEventSummary; }
+
+public String getLastNotifiedEmailSubject() { return lastNotifiedEmailSubject; }
+public void setLastNotifiedEmailSubject(String lastNotifiedEmailSubject) { this.lastNotifiedEmailSubject = lastNotifiedEmailSubject; }
 }

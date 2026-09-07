@@ -13,7 +13,9 @@ import com.atlasassistant.atlasassistant.model.User;
 import com.atlasassistant.atlasassistant.repository.GoogleTokenRepository;
 import com.atlasassistant.atlasassistant.repository.UserRepository;
 import com.atlasassistant.atlasassistant.service.AiService;
+import com.atlasassistant.atlasassistant.service.CalendarEvent;
 import com.atlasassistant.atlasassistant.service.CalendarService;
+import com.atlasassistant.atlasassistant.service.EmailMessage;
 import com.atlasassistant.atlasassistant.service.GmailService;
 import com.atlasassistant.atlasassistant.service.GoogleTokenService;
 
@@ -45,8 +47,10 @@ public class AssistantController {
         GoogleToken googleToken = googleTokenRepository.findByUser(user);
         String accessToken = googleTokenService.getValidAccessToken(googleToken);
 
-        List<String> emails = gmailService.getRecentEmailSubjects(accessToken);
-        List<String> events = calendarService.getUpcomingEvents(accessToken);
+        List<String> emails = gmailService.getRecentEmails(accessToken).stream()
+            .map(EmailMessage::getSubject).toList();
+        List<String> events = calendarService.getUpcomingEvents(accessToken).stream()
+            .map(CalendarEvent::getSummary).toList();
 
         String currentDateTime = java.time.ZonedDateTime.now().toString();
 

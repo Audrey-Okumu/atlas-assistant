@@ -15,8 +15,8 @@ import com.google.api.services.gmail.model.Message;
 @Service
 public class GmailService {
 
-    public List<String> getRecentEmailSubjects(String accessToken) throws Exception {
-        Credential credential = new Credential(com.google.api.client.auth.oauth2.BearerToken.authorizationHeaderAccessMethod())
+    public List<EmailMessage> getRecentEmails(String accessToken) throws Exception {
+        Credential credential = new Credential(com.google.api.client.auth.oauth2.BearerToken.    authorizationHeaderAccessMethod())
             .setAccessToken(accessToken);
 
         Gmail gmailService = new Gmail.Builder(
@@ -31,7 +31,7 @@ public class GmailService {
             .setMaxResults(5L)
             .execute();
 
-        List<String> subjects = new ArrayList<>();
+        List<EmailMessage> results = new ArrayList<>();
 
         if (response.getMessages() != null) {
             for (Message messageMeta : response.getMessages()) {
@@ -47,10 +47,10 @@ public class GmailService {
                     .map(h -> h.getValue())
                     .orElse("(No subject)");
 
-                subjects.add(subject);
+                results.add(new EmailMessage(messageMeta.getId(), subject));
             }
         }
 
-        return subjects;
+        return results;
     }
 }

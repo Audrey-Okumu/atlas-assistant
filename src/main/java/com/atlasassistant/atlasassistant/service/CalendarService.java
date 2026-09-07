@@ -15,8 +15,8 @@ import com.google.api.services.calendar.model.Events;
 @Service
 public class CalendarService {
 
-    public List<String> getUpcomingEvents(String accessToken) throws Exception {
-        Credential credential = new Credential(com.google.api.client.auth.oauth2.BearerToken.authorizationHeaderAccessMethod())
+    public List<CalendarEvent> getUpcomingEvents(String accessToken) throws Exception {
+        Credential credential = new Credential(com.google.api.client.auth.oauth2.BearerToken.    authorizationHeaderAccessMethod())
             .setAccessToken(accessToken);
 
         Calendar calendarService = new Calendar.Builder(
@@ -27,7 +27,7 @@ public class CalendarService {
             .build();
 
         com.google.api.client.util.DateTime now = new com.google.api.client.util.DateTime(System.currentTimeMillis());
-
+    
         Events events = calendarService.events().list("primary")
             .setMaxResults(5)
             .setTimeMin(now)
@@ -35,16 +35,17 @@ public class CalendarService {
             .setSingleEvents(true)
             .execute();
 
-        List<String> summaries = new ArrayList<>();
+        List<CalendarEvent> results = new ArrayList<>();
 
         for (Event event : events.getItems()) {
             String start = (event.getStart().getDateTime() != null)
                 ? event.getStart().getDateTime().toString()
                 : event.getStart().getDate().toString();
-
-            summaries.add(event.getSummary() + " at " + start);
+    
+            String summary = event.getSummary() + " at " + start;
+            results.add(new CalendarEvent(event.getId(), summary));
         }
-
-        return summaries;
+    
+        return results;
     }
 }

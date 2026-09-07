@@ -11,6 +11,7 @@ import com.atlasassistant.atlasassistant.model.GoogleToken;
 import com.atlasassistant.atlasassistant.model.User;
 import com.atlasassistant.atlasassistant.repository.GoogleTokenRepository;
 import com.atlasassistant.atlasassistant.repository.UserRepository;
+import com.atlasassistant.atlasassistant.service.CalendarEvent;
 import com.atlasassistant.atlasassistant.service.CalendarService;
 import com.atlasassistant.atlasassistant.service.GoogleTokenService;
 
@@ -38,6 +39,7 @@ public class CalendarController {
 
         String validAccessToken = googleTokenService.getValidAccessToken(googleToken);
 
-        return calendarService.getUpcomingEvents(validAccessToken);
+        return calendarService.getUpcomingEvents(validAccessToken).stream()
+            .map(CalendarEvent::getSummary).toList();
     }
 }
