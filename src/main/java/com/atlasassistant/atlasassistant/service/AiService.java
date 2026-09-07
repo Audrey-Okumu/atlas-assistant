@@ -4,14 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import com.atlasassistant.atlasassistant.model.GroqResponse;
 
 @Service
 public class AiService {
@@ -46,8 +45,7 @@ public class AiService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        String prompt = "Here is the user's data:\n\n" + context
-            + "\n\nBased only on the data above, answer this question concisely: " + question;
+        String prompt = "Here is the user's data:\n\n" + context + "\n\nBased only on the data above, answer this question concisely: " + question;
 
         Map<String, Object> requestBody = Map.of(
             "model", "openai/gpt-oss-120b",
@@ -56,18 +54,12 @@ public class AiService {
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+        GroqResponse response = restTemplate.postForObject(
             "https://api.groq.com/openai/v1/chat/completions",
-            HttpMethod.POST,
             request,
-            new ParameterizedTypeReference<Map<String, Object>>() {}
+            GroqResponse.class
         );
 
-        Map<String, Object> responseBody = response.getBody();
-
-        List<Map<String, Object>> choices = (List<Map<String, Object>>) responseBody.get("choices");
-        Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
-
-        return (String) message.get("content");
+        return response.getChoices().get(0).getMessage().getContent();
     }
 }
