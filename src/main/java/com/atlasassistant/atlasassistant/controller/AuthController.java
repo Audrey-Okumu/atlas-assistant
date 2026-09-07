@@ -26,6 +26,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public User register(@RequestBody User user) {
+        if (user.getPhoneNumber() == null || user.getPhoneNumber().isBlank()) {
+        throw new IllegalArgumentException("Phone number is required");
+        }
+        
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
