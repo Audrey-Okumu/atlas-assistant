@@ -17,6 +17,8 @@ import com.atlasassistant.atlasassistant.model.User;
 import com.atlasassistant.atlasassistant.repository.GoogleTokenRepository;
 import com.atlasassistant.atlasassistant.repository.UserRepository;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 
 @RestController
 public class OAuthController {
@@ -37,7 +39,7 @@ public class OAuthController {
     }
 
     @GetMapping("/oauth2/success")
-    public String oauth2Success(Principal principal, @AuthenticationPrincipal OAuth2User oauth2User) {
+    public void oauth2Success(Principal principal, @AuthenticationPrincipal OAuth2User oauth2User,HttpServletResponse response) throws Exception {
         OAuth2AuthorizedClient client =
             authorizedClientService.loadAuthorizedClient("google", principal.getName());
 
@@ -65,15 +67,14 @@ public class OAuthController {
             googleToken.setRefreshToken(refreshToken.getTokenValue());
         }
         googleToken.setAccessTokenExpiresAt(accessToken.getExpiresAt());
-
         googleTokenRepository.save(googleToken);
+
         String appJwt = jwtUtil.generateToken(user.getEmail());
+        boolean needsPhoneNumber = (user.getPhoneNumber() == null || user.getPhoneNumber().isBlank());
 
-        String phoneStatus = (user.getPhoneNumber() == null || user.getPhoneNumber().isBlank())
-            ? " | Phone number not set — call POST /users/phone-number with your JWT to enable WhatsApp."
-            : "";
+        String frontendUrl = "https://your-frontend-domain.vercel.app";
+        String redirectUrl = frontendUrl + "/oauth-success?token=" + appJwt + "&    needsPhone=" + needsPhoneNumber;
 
-        return "Google account connected successfully for " + email
-            + " | Your Atlas Assistant token: " + appJwt + phoneStatus;
+        response.sendRedirect(redirectUrl);
     }
 }
