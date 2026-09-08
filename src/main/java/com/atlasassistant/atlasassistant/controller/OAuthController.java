@@ -37,7 +37,7 @@ public class OAuthController {
     }
 
     @GetMapping("/oauth2/success")
-        public String oauth2Success(Principal principal, @AuthenticationPrincipal OAuth2User oauth2User) {
+    public String oauth2Success(Principal principal, @AuthenticationPrincipal OAuth2User oauth2User) {
         OAuth2AuthorizedClient client =
             authorizedClientService.loadAuthorizedClient("google", principal.getName());
 
@@ -69,6 +69,11 @@ public class OAuthController {
         googleTokenRepository.save(googleToken);
         String appJwt = jwtUtil.generateToken(user.getEmail());
 
-        return "Google account connected successfully for " + email + " | Your Atlas Assistant token: " + appJwt;
+        String phoneStatus = (user.getPhoneNumber() == null || user.getPhoneNumber().isBlank())
+            ? " | Phone number not set — call POST /users/phone-number with your JWT to enable WhatsApp."
+            : "";
+
+        return "Google account connected successfully for " + email
+            + " | Your Atlas Assistant token: " + appJwt + phoneStatus;
     }
 }
