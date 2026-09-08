@@ -72,7 +72,7 @@ public class OAuthController {
         String appJwt = jwtUtil.generateToken(user.getEmail());
         boolean needsPhoneNumber = (user.getPhoneNumber() == null || user.getPhoneNumber().isBlank());
 
-        String frontendUrl = "https://your-frontend-domain.vercel.app";
+        String frontendUrl = "http://localhost:5173";
         String redirectUrl = frontendUrl + "/oauth-success?token=" + appJwt + "&    needsPhone=" + needsPhoneNumber;
 
         response.sendRedirect(redirectUrl);
