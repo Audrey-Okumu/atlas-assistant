@@ -11,6 +11,7 @@ import com.atlasassistant.atlasassistant.model.GoogleToken;
 import com.atlasassistant.atlasassistant.model.User;
 import com.atlasassistant.atlasassistant.repository.GoogleTokenRepository;
 import com.atlasassistant.atlasassistant.repository.UserRepository;
+import com.atlasassistant.atlasassistant.service.EmailMessage;
 import com.atlasassistant.atlasassistant.service.GmailService;
 import com.atlasassistant.atlasassistant.service.GoogleTokenService;
 
@@ -47,6 +48,7 @@ public class EmailController {
 
         String validAccessToken = googleTokenService.getValidAccessToken(googleToken);
 
-        return gmailService.getRecentEmailSubjects(validAccessToken);
+        return gmailService.getRecentEmails(validAccessToken).stream()
+            .map(EmailMessage::getSubject).toList();
     }
 }
