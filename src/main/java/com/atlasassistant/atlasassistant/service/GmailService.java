@@ -28,7 +28,7 @@ public class GmailService {
 
         ListMessagesResponse response = gmailService.users().messages()
             .list("me")
-            .setMaxResults(5L)
+            .setMaxResults(15L)
             .execute();
 
         List<EmailMessage> results = new ArrayList<>();
