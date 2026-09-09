@@ -72,7 +72,7 @@ public class OAuthController {
         String appJwt = jwtUtil.generateToken(user.getEmail());
         boolean needsPhoneNumber = (user.getPhoneNumber() == null || user.getPhoneNumber().isBlank());
 
-        String frontendUrl = "http://localhost:5173";
+        String frontendUrl = "https://atlas-assistant-web-chi.vercel.app";
         String redirectUrl = frontendUrl + "/oauth-success?token=" + appJwt + "&    needsPhone=" + needsPhoneNumber;
 
         response.sendRedirect(redirectUrl);
